@@ -1,12 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   	<modelVersion>4.0.0</modelVersion>
-  
-  
+
+
   	<groupId>org.example</groupId>
   	<artifactId>blog.samples</artifactId>
   	<version>0.1</version>
   	<name>Blog Samples</name>
-  	  	
+
+  	<scm>
+  		<connection>scm:git:git://github.com/reta/bean-validation-samples.git</connection>
+  	</scm>
+
+ 	<properties>
+    	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  	</properties>
+
   	<dependencies>
   		<dependency>
 			<groupId>junit</groupId>
@@ -20,19 +28,19 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
 		</dependency>
-		
+
 		<dependency>
     		<groupId>ch.qos.logback</groupId>
     		<artifactId>logback-core</artifactId>
     		<version>0.9.26</version>
 		</dependency>
-		
+
 		<dependency>
     		<groupId>ch.qos.logback</groupId>
     		<artifactId>logback-classic</artifactId>
     		<version>0.9.26</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
@@ -45,23 +53,9 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-  	
+
   	<build>
 		<plugins>
-			<plugin>	
-				<groupId>org.codehaus.groovy.maven</groupId>
-				<artifactId>gmaven-plugin</artifactId>
-				<version>1.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generateTestStubs</goal>
-							<goal>testCompile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-					
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -70,11 +64,41 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>			
+			</plugin>
+
+			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>buildnumber-maven-plugin</artifactId>
+			    <version>1.0</version>
+			    <executions>
+			        <execution>
+						<phase>validate</phase>
+			            <goals>
+			                <goal>create</goal>
+			            </goals>
+			         </execution>
+			    </executions>
+       		</plugin>
+
+       		<plugin>
+			    <groupId>org.apache.maven.plugins</groupId>
+			    <artifactId>maven-jar-plugin</artifactId>
+			    <version>2.1</version>
+			    <configuration>
+			        <archive>
+			            <manifest>
+			                <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+			            </manifest>
+			            <manifestEntries>
+			                <Git-SHA-1>${buildNumber}</Git-SHA-1>
+			            </manifestEntries>
+			        </archive>
+			    </configuration>
+			</plugin>
 		</plugins>
 	</build>
-	
-	<repositories>	
+
+	<repositories>
 		<repository>
 			<id>jboss</id>
 			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
