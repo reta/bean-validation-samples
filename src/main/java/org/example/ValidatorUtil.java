@@ -1,17 +1,22 @@
 package org.example;
 
 import java.lang.annotation.ElementType;
+import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import javax.validation.MethodValidator;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.groups.Default;
+import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
+import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.metadata.Scope;
 
@@ -20,10 +25,6 @@ import org.hibernate.validator.HibernateValidatorConfiguration;
 import org.hibernate.validator.cfg.ConstraintMapping;
 import org.hibernate.validator.cfg.defs.NotNullDef;
 import org.hibernate.validator.cfg.defs.SizeDef;
-import org.hibernate.validator.method.MethodValidator;
-import org.hibernate.validator.method.metadata.MethodDescriptor;
-import org.hibernate.validator.method.metadata.ParameterDescriptor;
-import org.hibernate.validator.method.metadata.TypeDescriptor;
 
 public class ValidatorUtil {
 	private final ValidatorFactory factory;
@@ -88,8 +89,11 @@ public class ValidatorUtil {
 	 * http://in.relation.to/Bloggers/HibernateValidator410Beta2WithProgrammaticConstraintConfigurationAPI
 	 */
 	public< T > void add( final Class< T > clazz, final String propertName ) {
-		final ConstraintMapping mapping = new ConstraintMapping();
-		
+		final HibernateValidatorConfiguration config = Validation
+				.byProvider( HibernateValidator.class )
+				.configure();
+
+		final ConstraintMapping mapping =  config.createConstraintMapping();		
 		mapping.type( clazz )
 		    .property( propertName, ElementType.METHOD )
 		        .constraint( new NotNullDef() )
@@ -99,16 +103,25 @@ public class ValidatorUtil {
 		            .min( 2 )
 		            .max( 14 )
 		         );
-		
-		final HibernateValidatorConfiguration config = Validation
-			.byProvider( HibernateValidator.class )
-			.configure();
-		
+				
 		config.addMapping( mapping );
 		ValidatorFactory factory = config.buildValidatorFactory();
 		Validator validator = factory.getValidator();
 		
 		find( clazz, propertName, validator );
+	}
+	
+	public< T > void validate( final Method method, Object[] arguments, final T instance  ) {
+		MethodValidator methodValidator = Validation
+			    .buildDefaultValidatorFactory()
+			    .getValidator()
+			    .forMethods();
+
+		Set< ConstraintViolation< T > > violations = methodValidator.validateParameters( instance, method, arguments);
+		if( !violations.isEmpty() ) {
+			throw new ConstraintViolationException( violations );
+		}
+				
 	}
 	
 	/**
@@ -117,15 +130,15 @@ public class ValidatorUtil {
 	 * @param clazz
 	 */
 	public< T > void validate( final Class< T > clazz  ) {
-		final MethodValidator validator = Validation
+		final Validator validator = Validation
 			.byProvider( HibernateValidator.class )
 	    	.configure()
 	    	.failFast( true )	// validation will terminate on the first validation error
 	    	.buildValidatorFactory()
 	    	.getValidator()
-	    	.unwrap( MethodValidator.class );
+	    	.unwrap( Validator.class );
 
-		TypeDescriptor descriptor = validator.getConstraintsForType( clazz );
+		BeanDescriptor descriptor = validator.getConstraintsForClass( clazz );
 		Set< MethodDescriptor > constrainedMethods = descriptor.getConstrainedMethods();
 
 		for( final MethodDescriptor methodDescriptor: constrainedMethods ) {
