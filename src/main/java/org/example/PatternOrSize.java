@@ -22,7 +22,7 @@ import org.hibernate.validator.constraints.ConstraintComposition;
 @Retention( RetentionPolicy.RUNTIME )
 @Constraint(validatedBy = { })
 public @interface PatternOrSize {
-	public abstract String message() default "OR";
+	public abstract String message() default "Value '${validatedValue}' should start from 'K' or be at least 2 characters long";
 	public abstract Class<?>[] groups() default { };
 	public abstract Class< ? extends Payload >[] payload() default { };
 }

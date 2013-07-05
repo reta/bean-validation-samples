@@ -4,7 +4,10 @@ import java.util.Date;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import javax.validation.constraintvalidation.SupportedValidationTarget;
+import javax.validation.constraintvalidation.ValidationTarget;
 
+@SupportedValidationTarget( value = ValidationTarget.PARAMETERS )
 public class ConsistentDateParametersValidator implements ConstraintValidator<ConsistentDateParameters, Object[]> {
 	@Override
     public void initialize(ConsistentDateParameters constraintAnnotation) {

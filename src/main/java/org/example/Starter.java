@@ -10,16 +10,17 @@ public class Starter {
 		new ValidatorUtil().find( Department.class, "persons" );
 
 		try {
-			new ValidatorUtil().validate( new Person() );
+			new ValidatorUtil().validate( new Person( new Department( "D") ) );
 		} catch( ConstraintViolationException ex ) {
 			for( final ConstraintViolation< ? > violation: ex.getConstraintViolations() ) {
 				System.out.println( String.format(
-					"Instance: %s, property: %s",
+					"Instance: %s, property: %s, with message: %s",
 					violation.getRootBean(),
-					violation.getPropertyPath()
+					violation.getPropertyPath(),
+					violation.getMessage()
 				) );
 			}
-		}
+		}		
 	}
 
 }

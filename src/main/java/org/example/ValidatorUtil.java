@@ -8,14 +8,15 @@ import java.util.Set;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.MethodValidator;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import javax.validation.executable.ExecutableValidator;
 import javax.validation.groups.Default;
 import javax.validation.metadata.BeanDescriptor;
 import javax.validation.metadata.ConstraintDescriptor;
 import javax.validation.metadata.MethodDescriptor;
+import javax.validation.metadata.MethodType;
 import javax.validation.metadata.ParameterDescriptor;
 import javax.validation.metadata.PropertyDescriptor;
 import javax.validation.metadata.Scope;
@@ -112,10 +113,10 @@ public class ValidatorUtil {
 	}
 	
 	public< T > void validate( final Method method, Object[] arguments, final T instance  ) {
-		MethodValidator methodValidator = Validation
+		ExecutableValidator methodValidator = Validation
 			    .buildDefaultValidatorFactory()
 			    .getValidator()
-			    .forMethods();
+			    .forExecutables();
 
 		Set< ConstraintViolation< T > > violations = methodValidator.validateParameters( instance, method, arguments);
 		if( !violations.isEmpty() ) {
@@ -139,7 +140,7 @@ public class ValidatorUtil {
 	    	.unwrap( Validator.class );
 
 		BeanDescriptor descriptor = validator.getConstraintsForClass( clazz );
-		Set< MethodDescriptor > constrainedMethods = descriptor.getConstrainedMethods();
+		Set< MethodDescriptor > constrainedMethods = descriptor.getConstrainedMethods( MethodType.GETTER, MethodType.values() );
 
 		for( final MethodDescriptor methodDescriptor: constrainedMethods ) {
 			List< ParameterDescriptor > parameterConstraints = methodDescriptor.getParameterDescriptors();

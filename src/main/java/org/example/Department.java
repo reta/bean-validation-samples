@@ -12,7 +12,16 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 public class Department {
 	@NotEmpty @Valid private Collection< Person > persons;
+	@PatternOrSize private final String name;
 
+	public Department( final String name ) {
+		this.name = name;
+	}
+	
+	public String getName() {
+		return name;
+	}
+	
 	public void setPersons( Collection< Person > persons ) {
 		this.persons = persons;
 	}

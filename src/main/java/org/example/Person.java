@@ -11,6 +11,11 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class Person {
 	@NotEmpty private String firstName;
 	@NotEmpty private String lastName;
+	@Valid @NotNull private Department department;
+	
+	public Person( final Department department ) {
+		this.department = department;
+	}
     
 	public void setFirstName( String firstName ) {
 		this.firstName = firstName;

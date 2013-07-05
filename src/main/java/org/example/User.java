@@ -3,8 +3,8 @@ package org.example;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.validation.ConvertGroup;
 import javax.validation.Valid;
+import javax.validation.groups.ConvertGroup;
 import javax.validation.groups.Default;
 
 import org.example.Address.BasicPostal;
